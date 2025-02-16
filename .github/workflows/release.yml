@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0  # Nécessaire pour récupérer tous les tags Git
 
       - name: Install GitHub CLI
-        run: apt-get install -y gh
+        run: sudo apt-get install -y gh
 
       - name: Set up Git user
         run: |
