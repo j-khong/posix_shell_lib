@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'  # Déclenche l’action pour tout tag commençant par "v"
+      - '*'  # Déclenche l’action pour tout tag
 
 jobs:
   release:
