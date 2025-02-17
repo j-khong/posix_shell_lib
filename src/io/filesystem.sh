@@ -96,14 +96,14 @@ check_mandatory_folder() {
     fi
 }
 
-get_file_line_count(){
+get_file_line_count() {
     if [ -z "$1" ]; then echo "0"; return 1; fi
     if [ ! -f "$1" ]; then echo "0"; return 1; fi
 
     cat $1 | wc -l | tr -d ' '
 }
 
-read_file(){
+read_file() {
     __file_path=$1
     __callback=$2
     
