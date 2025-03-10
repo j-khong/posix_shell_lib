@@ -1,16 +1,18 @@
 #!/bin/sh
 set -e
 
-version=$1
+dest_folder=$1
+version=$2
 
 lib_name=posix_shell_lib
 repo="j-khong/$lib_name"
 last_version=$(curl -s "https://api.github.com/repos/$repo/tags" | grep '"name"' | head -n 1 | awk -F '"' '{print $4}')
 
+[ -z "$dest_folder" ] && { dest_folder=$HOME; }
 [ -z "$version" ] && { version=$last_version; }
 
 install_folder_name=".$lib_name"
-root_install_folder=~/$install_folder_name
+root_install_folder=$dest_folder/$install_folder_name
 mkdir -p "$root_install_folder"
 installed_version_folder=$root_install_folder/$version
 if [ -d "$installed_version_folder" ]; then 
@@ -40,13 +42,20 @@ if [ "$version" == "$last_version" ]; then
     ln -s "$installed_version_folder" "$symlink_name"
 fi
 
+file_to_edit=$root_install_folder/$version/import.sh
+if [ -f "$file_to_edit" ]; then
+    echo "__install_path=$dest_folder" > "$file_to_edit.tmp"
+    cat "$file_to_edit" >> "$file_to_edit.tmp"
+    mv "$file_to_edit.tmp" "$file_to_edit"
+fi
+
 echo "✅ installation done !"
 
 echo ""
 
 echo "you can import a specific lib file in your scripts with :"
-echo ". $HOME/$install_folder_name/$version/{the_file_path}"
+echo ". $root_install_folder/$version/{the_file_path}"
 if [ "$version" == "$last_version" ]; then
     echo "or"
-    echo ". $HOME/$install_folder_name/latest/{the_file_path}"
+    echo ". $root_install_folder/latest/{the_file_path}"
 fi

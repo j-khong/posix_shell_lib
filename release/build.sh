@@ -5,7 +5,7 @@ lib_name="$1"
 output_dir="$2"
 
 if [ -z "$lib_name" ] || [ -z "$output_dir" ]; then
-    echo "Usage: $0 <lib_name> <output_dir>"
+    echo "Usage: $0 <version_number> <output_dir>"
     exit 1
 fi
 
@@ -28,7 +28,8 @@ expand_path() {
 expanded_dir=$(expand_path "$output_dir")
 
 if is_absolute_path "$expanded_dir"; then
-    echo "output_dir is an absolute path."
+    # echo "output_dir is an absolute path."
+    :
 else
     echo "output_dir [$expanded_dir] is not an absolute path."
     exit 1
@@ -110,10 +111,12 @@ process_file() {
 source_dir="src"
 
 work_dir="/tmp/workdir-$(date +%s)"
+echo "⚙️ creating workdir..." && \
 if [ -d "$work_dir" ]; then rm -fr "$work_dir"; fi
 mkdir "$work_dir" && \
 cp -fr "$source_dir" "$work_dir/$lib_name" && \
 cd "$work_dir" && \
+echo "✅ done" && \
 
 # Export the function to use it in find -exec
 export -f process_file && \
@@ -121,11 +124,19 @@ export -f process_file && \
 # Find and process all .sh files
 # cd "$lib_name"
 # find . -name "*.sh" -exec bash -c 'process_file "$0" "$1"' {} "$output_dir" \;
+echo "⚙️ generating lib..." && \
 find "$lib_name" -name "*.sh" -exec bash -c 'process_file "$0" "$1"' {} "$output_dir" \; && \
+echo "✅ done" && \
 
-echo "Processing complete." && \
-echo "version $lib_name as been generated." && \
-echo "Check the output directory: $output_dir" && \
+echo "⚙️ generating main import" && \
+cd - && \
+find ./src -name "*.sh" -exec bash -c 'echo ". \$__install_path/.posix_shell_lib/'$lib_name'/${0/.\/src\//}"'  {} \; > "$output_dir/$lib_name/import.sh" && \
+echo "✅ done" && \
 
-cd .. && \
-rm -fr "$work_dir" || echo '❌ error'
+
+echo "⚙️ cleaning..." && \
+rm -fr "$work_dir" && \
+echo "✅ done" && \
+
+
+echo "🚀 package generated" || echo '❌ error'
