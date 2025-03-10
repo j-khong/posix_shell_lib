@@ -47,7 +47,7 @@ set_optional_positive_value() {
     __optional_value=$2
 
     if [ ! -z "$__optional_value" ] && is_number "$__optional_value" && [ "$__optional_value" -gt 0 ]; then
-        eval "$__var_to_set_name=\$local_optional_value"
+        eval "$__var_to_set_name=\$__optional_value"
     fi
 
 }
