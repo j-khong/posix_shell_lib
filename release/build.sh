@@ -136,7 +136,4 @@ echo "✅ done" && \
 
 echo "⚙️ cleaning..." && \
 rm -fr "$work_dir" && \
-echo "✅ done" && \
-
-
-echo "🚀 package generated" || echo '❌ error'
+echo "✅ done" || echo '❌ error'
