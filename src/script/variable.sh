@@ -30,7 +30,7 @@ get_input_variables() {
     # Convert the variable names into a list and iterate over them
     for __var_name in $__var_names; do
         eval "$__var_name=\${1:-}" # Assign each argument to a corresponding variable
-        shift                    # Move to the next command-line argument
+        [ $# -gt 0 ] && shift     # Move to the next argument only if one exists
     done
 }
 

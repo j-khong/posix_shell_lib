@@ -46,7 +46,7 @@ find_unique_file() {
     __count=0
     
     if [ ! -d "$__folder" ]; then
-        return $____ERR_MISSING_FOLDER
+        return $__ERR_MISSING_FOLDER
     fi
     
     # searching files matching regexp
