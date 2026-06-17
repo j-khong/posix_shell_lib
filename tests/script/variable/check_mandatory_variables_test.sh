@@ -42,12 +42,19 @@ assert_exit1 "variable not set at all" \
 # --- custom print_error function is called (we verify exit 1 still occurs)
 assert_exit1 "custom print_error called on failure" \
     sh -c ". \"$SRC\"
-           my_err() { printf 'custom: %s\n' \"\$1\" >/dev/null; }
+           my_err() { printf 'custom: %s\n' \"$1\" >/dev/null; }
            MISSING=''
            $function_name \"MISSING\" my_err"
 
 # --- custom print_error NOT a command: default message, still exit 1
 assert_exit1 "non-command print_error falls back to default" \
     sh -c ". \"$SRC\"; BAD=''; $function_name \"BAD\" not_a_command"
+
+# --- IFS=, with space-separated variable list
+assert_exit0 "IFS=, with space-separated var list (all set)" \
+    sh -c "IFS=,; . \"$SRC\"; VAR1=hello VAR2=world; $function_name \"VAR1 VAR2\""
+
+assert_exit1 "IFS=, with space-separated var list (one missing)" \
+    sh -c "IFS=,; . \"$SRC\"; VAR1=hello VAR2=; $function_name \"VAR1 VAR2\""
 
 assert_summary

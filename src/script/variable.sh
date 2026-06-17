@@ -1,7 +1,10 @@
 check_mandatory_variables() {
     __variables="$1"
     __print_error=$2
-
+    
+    # sets our own IFS and restore it afterwards
+    __old_ifs=$IFS
+    IFS=' '
     for __var in $__variables; do
         eval __value=\$$__var
         if [ -z "$__value" ]; then
@@ -10,9 +13,11 @@ check_mandatory_variables() {
             else
                 echo "Error: variable '$__var' is empty or not set."
             fi
+            IFS=$__old_ifs
             exit 1
         fi
     done
+    IFS=$__old_ifs
 }
 
 # usage : get_input_variables "arg1 arg2 arg3" "$@"
