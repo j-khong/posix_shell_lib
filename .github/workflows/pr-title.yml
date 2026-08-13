@@ -1,0 +1,25 @@
+name: Validate PR title
+
+# Every PR title must declare the semver bump it implies, so the merge-to-main
+# workflow can compute the next version from it.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  validate-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Title must start with [patch], [minor] or [major]
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          case "$TITLE" in
+            "[patch]"* | "[minor]"* | "[major]"*)
+              echo "✅ valid PR title: $TITLE"
+              ;;
+            *)
+              echo "❌ PR title must start with [patch], [minor] or [major] (got: '$TITLE')"
+              exit 1
+              ;;
+          esac

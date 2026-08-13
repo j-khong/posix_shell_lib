@@ -1,0 +1,63 @@
+name: Tag on merge to main
+
+# When a PR is merged into main, read the [patch]/[minor]/[major] hint from the
+# PR title, compute the next semver from the latest tag and tag the merge commit.
+# Pushing that tag triggers release.yml (make release).
+#
+# IMPORTANT: the tag is pushed with a PAT (secrets.RELEASE_TOKEN), not the default
+# GITHUB_TOKEN, because a tag pushed with GITHUB_TOKEN does NOT trigger other
+# workflows (GitHub's recursive-run protection) — release.yml would never fire.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main with full history
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0            # need all tags for git describe
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Compute next version and tag the commit
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          # 1. extract the bump type from the PR title
+          case "$TITLE" in
+            "[patch]"*) bump=patch ;;
+            "[minor]"*) bump=minor ;;
+            "[major]"*) bump=major ;;
+            *)
+              echo "❌ PR title must start with [patch], [minor] or [major] (got: '$TITLE')"
+              exit 1
+              ;;
+          esac
+
+          # 2. current version from the latest tag
+          last_tag=$(git describe --tags --abbrev=0)
+
+          # 3. compute the next version using the library's own function
+          . ./src/semver.sh
+          new_tag=$(calculate_next_version "$last_tag" "$bump")
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "❌ calculate_next_version failed (last_tag='$last_tag', bump='$bump', code=$code)"
+            exit 1
+          fi
+
+          echo "last_tag=$last_tag  bump=$bump  new_tag=$new_tag"
+
+          # 4. tag the merge commit (current HEAD of main) and push
+          git tag "$new_tag"
+          git push origin "$new_tag"
