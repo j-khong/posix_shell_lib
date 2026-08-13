@@ -16,7 +16,7 @@
 #       - Returns 0 if the version matches the semver format
 #   On failure:
 #       - Logs the error (custom function or default message)
-#       - Exits with code 1
+#       - Returns 1
 #
 # Example Usage:
 #   is_valid "1.2.3"
@@ -36,8 +36,10 @@ is_valid() {
         else
             echo "❌ version '$__version' is not a semver format (ex: 1.2.3)"
         fi
-        exit 1
+        return 1
     fi
+
+    return 0
 }
 
 ###############################################################################
