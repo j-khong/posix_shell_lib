@@ -1,4 +1,46 @@
 ###############################################################################
+# Function: is_valid
+#
+# Description:
+#   Check that a string is a valid semantic version
+#   (MAJOR.MINOR.PATCH with optional pre-release and build metadata)
+#
+# Arguments:
+#   $1 - The version string to validate
+#   $2 - (optional) The name of a function used to log the error.
+#        If provided and it is a command, it is called with the version
+#        as argument; otherwise the default error message is printed.
+#
+# Returns:
+#   On success:
+#       - Returns 0 if the version matches the semver format
+#   On failure:
+#       - Logs the error (custom function or default message)
+#       - Exits with code 1
+#
+# Example Usage:
+#   is_valid "1.2.3"
+#   is_valid "1.2.3" my_log_function
+#
+# Notes:
+#   - POSIX compliant: relies on `grep -E` instead of the bash `[[ =~ ]]`
+#     construct so the function stays portable across shells.
+###############################################################################
+is_valid() {
+    __version=$1
+    __print_error=$2
+
+    if ! echo "$__version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'; then
+        if command -v "$__print_error" >/dev/null 2>&1; then
+            eval "$__print_error \"$__version\""
+        else
+            echo "❌ version '$__version' is not a semver format (ex: 1.2.3)"
+        fi
+        exit 1
+    fi
+}
+
+###############################################################################
 # Function: calculate_next_version
 #
 # Description:
