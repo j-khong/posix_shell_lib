@@ -66,6 +66,13 @@ find_unique_file() {
     fi
 }
 
+# Description:
+#   Exit with code 1 if the given path is not a regular file.
+#
+# Arguments:
+#   $1 - Path of the file to check
+#   $2 - (optional) Name of a function called with the path to log the error;
+#        a default message is printed if absent or not a command
 check_mandatory_file() {
     __file_name=$1
     __print_error=$2
@@ -81,6 +88,13 @@ check_mandatory_file() {
     fi
 }
 
+# Description:
+#   Exit with code 1 if the given path is not a directory.
+#
+# Arguments:
+#   $1 - Path of the folder to check
+#   $2 - (optional) Name of a function called with the path to log the error;
+#        a default message is printed if absent or not a command
 check_mandatory_folder() {
     __folder_name=$1
     __print_error=$2
@@ -96,6 +110,14 @@ check_mandatory_folder() {
     fi
 }
 
+# Description:
+#   Print the number of lines of a file (0 if missing or no argument).
+#
+# Arguments:
+#   $1 - Path of the file
+#
+# Returns:
+#   0 and prints the count on success, 1 if the file is missing
 get_file_line_count() {
     if [ -z "$1" ]; then echo "0"; return 1; fi
     if [ ! -f "$1" ]; then echo "0"; return 1; fi
@@ -103,6 +125,15 @@ get_file_line_count() {
     cat "$1" | wc -l | tr -d ' '
 }
 
+# Description:
+#   Read a file line by line and call a callback for each line.
+#
+# Arguments:
+#   $1 - Path of the file
+#   $2 - Name of the callback, called as: callback <total_lines> <index> <line>
+#
+# Returns:
+#   Exits if the callback is not a command
 read_file() {
     __file_path=$1
     __callback=$2

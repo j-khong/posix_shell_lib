@@ -12,6 +12,13 @@ build: gen_lib
 gen_lib:
 	if [ -d $(DIST_DIR) ]; then rm -fr $(DIST_DIR); fi
 	./release/build.sh "$(VERSION)" "$(shell pwd)/$(DIST_DIR)"
+	./release/gen_index.sh "$(DIST_DIR)/$(VERSION)/FUNCTIONS.md"
+	mkdir -p "$(DIST_DIR)/$(VERSION)/skill"
+	cp .claude/skills/posix-shell-lib/SKILL.md "$(DIST_DIR)/$(VERSION)/skill/SKILL.md"
+	cp "$(DIST_DIR)/$(VERSION)/FUNCTIONS.md" "$(DIST_DIR)/$(VERSION)/skill/FUNCTIONS.md"
+
+docs:
+	./release/gen_index.sh .claude/skills/posix-shell-lib/FUNCTIONS.md
 
 release: build
 	gh release create $(VERSION) $(TARFILE) --title "$(VERSION)" --notes "new version $(VERSION)"
@@ -30,6 +37,6 @@ gen_config:
 	@echo '' >> tests/config.sh
 
 
-.PHONY: all build release tests
+.PHONY: all build release tests docs
 
 
