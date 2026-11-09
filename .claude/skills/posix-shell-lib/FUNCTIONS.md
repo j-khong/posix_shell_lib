@@ -28,6 +28,10 @@ Read the comment block above the function in `src/<file>` for arguments, return 
 - `posixshell_io_terminal__print_in_orange` (`print_in_orange`) - Print a text in orange.
 - `posixshell_io_terminal__ask_confirmation` (`ask_confirmation`) - Ask the user to type a given string to continue; exit with code 1 otherwise.
 
+## io/terminal/cli.sh
+
+- `posixshell_io_terminal_cli__parse_arguments` (`parse_arguments`) - Generic CLI argument parsing driven by a conf file. Each value is written to the global variable named in the 'variable' column of the conf file (the default is applied if the option is absent).
+
 ## io/terminal/menu.sh
 
 - `posixshell_io_terminal_menu__display` (`display`) - Display an interactive terminal menu (arrows or j/k, Enter) and call a callback with the selected key.
