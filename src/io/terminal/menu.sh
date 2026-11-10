@@ -21,6 +21,14 @@
 # delete=Delete selected files"
 # display "$items" "my_callback"
 
+# Description:
+#   Display an interactive terminal menu (arrows or j/k, Enter) and call a callback with the selected key.
+#
+# Arguments:
+#   $1 - Newline separated items, "key=Display value" or plain strings
+#   $2 - Name of the callback, called with the selected key
+#   $3 - (optional) Name of the callback called on exit
+#
 display() {
     __list_to_display="$1"
     __callback="$2"

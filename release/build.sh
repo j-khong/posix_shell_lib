@@ -79,7 +79,7 @@ process_file() {
 
     # First pass: Identify functions and build arrays of original and prefixed names
     while IFS= read -r line; do
-        if [[ "$line" =~ ^[a-zA-Z_][a-zA-Z0-9_]*\(\)\ \{ ]]; then
+        if [[ "$line" =~ ^[a-zA-Z_][a-zA-Z0-9_]*\(\)\ *\{ ]]; then
             func_name=$(echo "$line" | awk '{print $1}' | sed 's/()//')
             original_funcs+=("$func_name")
             full_func_name="${namespace}${namespace_delim}${func_name}"
