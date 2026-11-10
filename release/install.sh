@@ -15,8 +15,27 @@ install_folder_name=".$lib_name"
 root_install_folder=$dest_folder/$install_folder_name
 mkdir -p "$root_install_folder"
 installed_version_folder=$root_install_folder/$version
-if [ -d "$installed_version_folder" ]; then 
+
+# optional: expose the Claude Code skill shipped with the lib (INSTALL_SKILL=1)
+install_skill() {
+    [ "$INSTALL_SKILL" = "1" ] || return 0
+    skill_source="$root_install_folder/latest/skill"
+    skills_folder="$HOME/.claude/skills"
+    skill_link="$skills_folder/posix-shell-lib"
+    if [ ! -d "$skill_source" ]; then
+        echo "⚠️ no skill found in $skill_source (install the latest version to get it)"
+    elif [ -e "$skill_link" ] || [ -L "$skill_link" ]; then
+        echo "ℹ️ skill link already exists => $skill_link"
+    else
+        mkdir -p "$skills_folder"
+        ln -s "$skill_source" "$skill_link"
+        echo "🤖 Claude Code skill linked => $skill_link"
+    fi
+}
+
+if [ -d "$installed_version_folder" ]; then
     echo "lib v.$version is already installed => $installed_version_folder"
+    install_skill
     exit 0
 fi
 
@@ -60,21 +79,8 @@ if [ "$version" == "$last_version" ]; then
     echo ". $root_install_folder/latest/{the_file_path}"
 fi
 
-# optional: expose the Claude Code skill shipped with the lib (INSTALL_SKILL=1)
-if [ "$INSTALL_SKILL" = "1" ]; then
-    skill_source="$root_install_folder/latest/skill"
-    skills_folder="$HOME/.claude/skills"
-    skill_link="$skills_folder/posix-shell-lib"
-    if [ ! -d "$skill_source" ]; then
-        echo "⚠️ no skill found in $skill_source (install the latest version to get it)"
-    elif [ -e "$skill_link" ] || [ -L "$skill_link" ]; then
-        echo "ℹ️ skill link already exists => $skill_link"
-    else
-        mkdir -p "$skills_folder"
-        ln -s "$skill_source" "$skill_link"
-        echo "🤖 Claude Code skill linked => $skill_link"
-    fi
-else
+install_skill
+if [ "$INSTALL_SKILL" != "1" ]; then
     echo ""
     echo "to also install the Claude Code skill, rerun with INSTALL_SKILL=1 (installs a link in ~/.claude/skills)"
 fi
